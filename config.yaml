@@ -1,0 +1,34 @@
+trainer:
+  checkpoint_callback: true
+  callbacks:
+    - class_path: pytorch_lightning.callbacks.LearningRateMonitor
+      init_args:
+        logging_interval: epoch
+    - class_path: pytorch_lightning.callbacks.ModelCheckpoint
+      init_args:
+        save_top_k: 1
+        monitor: val_ExpRate
+        mode: max
+  # gpus: 1
+  gpus: 4
+  accelerator: ddp
+  check_val_every_n_epoch: 2
+  max_epochs: 300
+model:
+  d_model: 256
+  growth_rate: 24
+  num_layers: 16
+  nhead: 8
+  num_decoder_layers: 3
+  dim_feedforward: 1024
+  dropout: 0.3
+  beam_size: 10
+  max_len: 200
+  alpha: 1.0
+  learning_rate: 1.0
+  patience: 20
+data:
+  zipfile_path: data.zip
+  test_year: 2014
+  batch_size: 8
+  num_workers: 5
