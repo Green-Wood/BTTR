@@ -53,7 +53,16 @@ trainer.fit(model, datamodule=dm)
 trainer.test(datamodule=dm)
 ```
 
-### Citation   
+## Note
+Metrics used in validation is not accurate.
+
+For more accurate metrics:
+1. use `test.py` to generate result.zip
+2. download and install [crohmelib](http://saskatoon.cs.rit.edu:10001/root/crohmelib), [lgeval](http://saskatoon.cs.rit.edu:10001/root/lgeval), and [tex2symlg](https://www.cs.rit.edu/~crohme2019/downloads/convert2symLG.zip) tool.
+3. convert tex file to symLg file using `tex2symlg` command
+4. evaluate two folder using `evaluate` command
+
+<!-- ### Citation   
 ```
 @article{YourName,
   title={Your Title},
@@ -61,4 +70,4 @@ trainer.test(datamodule=dm)
   journal={Location},
   year={Year}
 }
-```   
+```    -->
