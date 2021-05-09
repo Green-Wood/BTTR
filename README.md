@@ -1,10 +1,10 @@
 <div align="center">    
  
 # Handwritten Mathematical Expression Recognition with Bidirectionally Trained Transformer    
-<!--
+
 ARXIV   
-[![Paper](http://img.shields.io/badge/arxiv-math.co:1480.1111-B31B1B.svg)](https://www.nature.com/articles/nature14539)
---> 
+[![Paper](http://img.shields.io/badge/arxiv-math.co:1480.1111-B31B1B.svg)](https://arxiv.org/abs/2105.02412)
+ 
 </div>
  
 ## Description   
