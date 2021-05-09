@@ -51,7 +51,7 @@ class Decoder(pl.LightningModule):
         nhead: int,
         num_decoder_layers: int,
         dim_feedforward: int,
-        dropout: int,
+        dropout: float,
     ):
         super().__init__()
 
