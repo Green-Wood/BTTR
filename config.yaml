@@ -1,3 +1,4 @@
+seed_everything: 7
 trainer:
   checkpoint_callback: true
   callbacks:
