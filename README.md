@@ -23,13 +23,20 @@ conda activate bttr
 conda install --yes -c pytorch pytorch=1.7.0 torchvision cudatoolkit=11.0
 pip install -e .   
  ```   
- Next, navigate to any file and run it.
+ Next, navigate to any file and run it. It may take **6~7** hours to coverage on **4** gpus using ddp.
  ```bash
 # module folder
 cd BTTR
 
-# train bttr model  
+# train bttr model using 4 gpus and ddp
 python train.py --config config.yaml  
+```
+
+For single gpu user, you may change the `config.yaml` file to
+```yaml
+gpus: 1
+# gpus: 4
+# accelerator: ddp
 ```
 
 ## Imports
@@ -62,12 +69,12 @@ For more accurate metrics:
 3. convert tex file to symLg file using `tex2symlg` command
 4. evaluate two folder using `evaluate` command
 
-<!-- ### Citation   
+### Citation   
 ```
-@article{YourName,
-  title={Your Title},
-  author={Your team},
-  journal={Location},
-  year={Year}
+@article{zhao2021handwritten,
+  title={Handwritten Mathematical Expression Recognition with Bidirectionally Trained Transformer},
+  author={Zhao, Wenqi and Gao, Liangcai and Yan, Zuoyu and Peng, Shuai and Du, Lin and Zhang, Ziyin},
+  journal={arXiv preprint arXiv:2105.02412},
+  year={2021}
 }
-```    -->
+```   
