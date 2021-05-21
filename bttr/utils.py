@@ -61,20 +61,6 @@ class ExpRateRecorder(Metric):
         return exp_rate
 
 
-class ResultRecorder(Metric):
-    def __init__(self, dist_sync_on_step=False):
-        super().__init__(dist_sync_on_step=dist_sync_on_step)
-
-        self.add_state("result", default=[])
-
-    def update(self, img_base: str, indices_hat: List[int]) -> None:
-        pred = vocab.indices2label(indices_hat)
-        self.result.append((img_base, pred))
-
-    def compute(self) -> List[Tuple[str, str]]:
-        return self.result
-
-
 def ce_loss(
     output_hat: torch.Tensor, output: torch.Tensor, ignore_idx: int = vocab.PAD_IDX
 ) -> torch.Tensor:

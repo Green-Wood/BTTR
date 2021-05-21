@@ -6,7 +6,7 @@ from torch import FloatTensor, LongTensor
 
 from bttr.datamodule import Batch
 from bttr.model.bttr import BTTR
-from bttr.utils import ExpRateRecorder, ResultRecorder, ce_loss, to_bi_tgt_out
+from bttr.utils import ExpRateRecorder, ce_loss, to_bi_tgt_out
 
 
 class LitBTTR(pl.LightningModule):
@@ -43,7 +43,6 @@ class LitBTTR(pl.LightningModule):
         )
 
         self.exprate_recorder = ExpRateRecorder()
-        self.result_recorder = ResultRecorder()
 
     def forward(
         self, img: FloatTensor, img_mask: LongTensor, tgt: LongTensor
@@ -108,17 +107,17 @@ class LitBTTR(pl.LightningModule):
             batch.imgs, batch.mask, self.hparams.beam_size, self.hparams.max_len
         )
         best_hyp = max(hyps, key=lambda h: h.score / (len(h) ** self.hparams.alpha))
-        self.result_recorder(batch.img_bases[0], best_hyp.seq)
         self.exprate_recorder(best_hyp.seq, batch.indices[0])
 
-    def test_epoch_end(self, _) -> None:
+        return batch.img_bases[0], best_hyp
+
+    def test_epoch_end(self, test_outputs) -> None:
         exprate = self.exprate_recorder.compute()
         print(f"ExpRate: {exprate}")
 
-        result = self.result_recorder.compute()
-        print(f"length of total file: {len(result)}")
+        print(f"length of total file: {len(test_outputs)}")
         with zipfile.ZipFile("result.zip", "w") as zip_f:
-            for img_base, pred in result:
+            for img_base, pred in test_outputs:
                 content = f"%{img_base}\n${pred}$".encode()
                 with zip_f.open(f"{img_base}.txt", "w") as f:
                     f.write(content)

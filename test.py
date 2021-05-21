@@ -3,8 +3,8 @@ from pytorch_lightning import Trainer
 from bttr.datamodule import CROHMEDatamodule
 from bttr.lit_bttr import LitBTTR
 
-test_year = "2016"
-ckp_path = "lightning_logs/version_1/checkpoints/epoch=189-step=71439.ckpt"
+test_year = "2014"
+ckp_path = "lightning_logs/pretrained-2014.ckpt"
 
 if __name__ == "__main__":
     trainer = Trainer(logger=False, gpus=1)
