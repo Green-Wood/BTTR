@@ -1,12 +1,13 @@
 import zipfile
 
 import pytorch_lightning as pl
+import torch
 import torch.optim as optim
 from torch import FloatTensor, LongTensor
 
-from bttr.datamodule import Batch
+from bttr.datamodule import Batch, vocab
 from bttr.model.bttr import BTTR
-from bttr.utils import ExpRateRecorder, ce_loss, to_bi_tgt_out
+from bttr.utils import ExpRateRecorder, Hypothesis, ce_loss, to_bi_tgt_out
 
 
 class LitBTTR(pl.LightningModule):
@@ -65,6 +66,37 @@ class LitBTTR(pl.LightningModule):
         """
         return self.bttr(img, img_mask, tgt)
 
+    def beam_search(
+        self,
+        img: FloatTensor,
+        beam_size: int = 10,
+        max_len: int = 200,
+        alpha: float = 1.0,
+    ) -> str:
+        """for inference, one image at a time
+
+        Parameters
+        ----------
+        img : FloatTensor
+            [1, h, w]
+        beam_size : int, optional
+            by default 10
+        max_len : int, optional
+            by default 200
+        alpha : float, optional
+            by default 1.0
+
+        Returns
+        -------
+        str
+            LaTex string
+        """
+        assert img.dim() == 3
+        img_mask = torch.zeros_like(img, dtype=torch.long)  # squeeze channel
+        hyps = self.bttr.beam_search(img.unsqueeze(0), img_mask, beam_size, max_len)
+        best_hyp = max(hyps, key=lambda h: h.score / (len(h) ** alpha))
+        return vocab.indices2label(best_hyp.seq)
+
     def training_step(self, batch: Batch, _):
         tgt, out = to_bi_tgt_out(batch.indices, self.device)
         out_hat = self(batch.imgs, batch.mask, tgt)
@@ -109,7 +141,7 @@ class LitBTTR(pl.LightningModule):
         best_hyp = max(hyps, key=lambda h: h.score / (len(h) ** self.hparams.alpha))
         self.exprate_recorder(best_hyp.seq, batch.indices[0])
 
-        return batch.img_bases[0], best_hyp
+        return batch.img_bases[0], vocab.indices2label(best_hyp.seq)
 
     def test_epoch_end(self, test_outputs) -> None:
         exprate = self.exprate_recorder.compute()
