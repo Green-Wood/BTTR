@@ -38,9 +38,8 @@ def _build_transformer_decoder(
         dim_feedforward=dim_feedforward,
         dropout=dropout,
     )
-    decoder_norm = nn.LayerNorm(d_model)
 
-    decoder = TransformerDecoder(decoder_layer, num_decoder_layers, decoder_norm)
+    decoder = TransformerDecoder(decoder_layer, num_decoder_layers)
     return decoder
 
 

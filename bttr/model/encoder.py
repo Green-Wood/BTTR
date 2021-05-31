@@ -87,6 +87,7 @@ class DenseNet(nn.Module):
         self.conv1 = nn.Conv2d(
             1, n_channels, kernel_size=7, padding=3, stride=2, bias=False
         )
+        self.norm1 = nn.BatchNorm2d(n_channels)
         self.dense1 = self._make_dense(
             n_channels, growth_rate, n_dense_blocks, bottleneck, use_dropout
         )
@@ -108,6 +109,7 @@ class DenseNet(nn.Module):
         )
 
         self.out_channels = n_channels + n_dense_blocks * growth_rate
+        self.post_norm = nn.BatchNorm2d(self.out_channels)
 
     @staticmethod
     def _make_dense(n_channels, growth_rate, n_dense_blocks, bottleneck, use_dropout):
@@ -122,6 +124,7 @@ class DenseNet(nn.Module):
 
     def forward(self, x, x_mask):
         out = self.conv1(x)
+        out = self.norm1(out)
         out_mask = x_mask[:, 0::2, 0::2]
         out = F.relu(out, inplace=True)
         out = F.max_pool2d(out, 2, ceil_mode=True)
@@ -133,6 +136,7 @@ class DenseNet(nn.Module):
         out = self.trans2(out)
         out_mask = out_mask[:, 0::2, 0::2]
         out = self.dense3(out)
+        out = self.post_norm(out)
         return out, out_mask
 
 
@@ -142,8 +146,7 @@ class Encoder(pl.LightningModule):
 
         self.model = DenseNet(growth_rate=growth_rate, num_layers=num_layers)
 
-        out_channels = (2 + 7 * num_layers) * growth_rate // 4
-        self.feature_proj = nn.Conv2d(out_channels, d_model, kernel_size=1)
+        self.feature_proj = nn.Conv2d(self.model.out_channels, d_model, kernel_size=1)
 
         self.pos_enc_2d = ImgPosEnc(d_model // 2, normalize=True)
 
