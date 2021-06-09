@@ -146,7 +146,11 @@ class Encoder(pl.LightningModule):
 
         self.model = DenseNet(growth_rate=growth_rate, num_layers=num_layers)
 
-        self.feature_proj = nn.Conv2d(self.model.out_channels, d_model, kernel_size=1)
+        self.feature_proj = nn.Sequential(
+            nn.Conv2d(self.model.out_channels, d_model, kernel_size=1),
+            nn.ReLU(inplace=True),
+        )
+        self.norm = nn.LayerNorm(d_model)
 
         self.pos_enc_2d = ImgPosEnc(d_model // 2, normalize=True)
 
@@ -169,6 +173,10 @@ class Encoder(pl.LightningModule):
         """
         feature, mask = self.model(img, img_mask)
         feature = self.feature_proj(feature)
+
+        feature = rearrange(feature, "b d h w -> b h w d")
+        feature = self.norm(feature)
+        feature = rearrange(feature, "b h w d -> b d h w")
 
         feature = self.pos_enc_2d(feature, mask)
 
