@@ -152,7 +152,7 @@ class Encoder(pl.LightningModule):
         )
         self.norm = nn.LayerNorm(d_model)
 
-        self.pos_enc_2d = ImgPosEnc(d_model // 2, normalize=True)
+        self.pos_enc_2d = ImgPosEnc(d_model, normalize=True)
 
     def forward(
         self, img: FloatTensor, img_mask: LongTensor
@@ -171,15 +171,18 @@ class Encoder(pl.LightningModule):
         Tuple[FloatTensor, LongTensor]
             [b, t, d], [b, t]
         """
+        # extract feature
         feature, mask = self.model(img, img_mask)
         feature = self.feature_proj(feature)
 
+        # proj
         feature = rearrange(feature, "b d h w -> b h w d")
         feature = self.norm(feature)
-        feature = rearrange(feature, "b h w d -> b d h w")
 
+        # positional encoding
         feature = self.pos_enc_2d(feature, mask)
 
-        feature = rearrange(feature, "b d h w -> b (h w) d")
+        # flat to 1-D
+        feature = rearrange(feature, "b h w d -> b (h w) d")
         mask = rearrange(mask, "b h w -> b (h w)")
         return feature, mask
