@@ -8,7 +8,7 @@ import torch.nn.functional as F
 from einops.einops import rearrange
 from torch import FloatTensor, LongTensor
 
-from .pos_enc import ImgPosEnc
+from .pos_enc import ImageRotaryEmbed, ImgPosEnc
 
 
 # DenseNet-B

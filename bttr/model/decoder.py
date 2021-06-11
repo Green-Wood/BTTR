@@ -9,7 +9,7 @@ from torch import FloatTensor, LongTensor
 from torch.nn.modules.transformer import TransformerDecoder
 
 from bttr.datamodule import vocab, vocab_size
-from bttr.model.pos_enc import WordPosEnc
+from bttr.model.pos_enc import WordPosEnc, WordRotaryEmbed
 from bttr.utils import Hypothesis, to_tgt_output
 
 
@@ -55,8 +55,7 @@ class Decoder(pl.LightningModule):
         super().__init__()
 
         self.word_embed = nn.Sequential(
-            nn.Embedding(vocab_size, d_model),
-            nn.LayerNorm(d_model)
+            nn.Embedding(vocab_size, d_model), nn.LayerNorm(d_model)
         )
 
         self.pos_enc = WordPosEnc(d_model=d_model)

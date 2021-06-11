@@ -1,14 +1,15 @@
 import math
+from typing import Optional
 
 import pytorch_lightning as pl
 import torch
 from einops import rearrange, repeat
 
-TEMPERATURE = 10000.0
-
 
 class WordPosEnc(pl.LightningModule):
-    def __init__(self, d_model: int = 512, max_len=500, temperature=10000.0) -> None:
+    def __init__(
+        self, d_model: int = 512, max_len: int = 500, temperature: float = 10000.0
+    ) -> None:
         super().__init__()
         pe = torch.zeros(max_len, d_model)
 
@@ -47,7 +48,13 @@ class ImgPosEnc(pl.LightningModule):
     used by the Attention is all you need paper, generalized to work on images.
     """
 
-    def __init__(self, d_model=512, temperature=10000, normalize=False, scale=None):
+    def __init__(
+        self,
+        d_model: int = 512,
+        temperature: float = 10000.0,
+        normalize: bool = False,
+        scale: Optional[float] = None,
+    ):
         super().__init__()
         assert d_model % 2 == 0
         self.half_d_model = d_model // 2
@@ -82,16 +89,21 @@ class ImgPosEnc(pl.LightningModule):
             y_embed = y_embed / (y_embed[:, -1:, :] + eps) * self.scale
             x_embed = x_embed / (x_embed[:, :, -1:] + eps) * self.scale
 
-        dim_t = torch.arange(
-            0, self.half_d_model, 2, dtype=torch.float, device=self.device
-        )
+        # not exactly the same as conccat two WordPosEnc
+        # WordPosEnc: sin(0), cos(0), sin(2), cos(2)
+        # ImagePosEnc: sin(0), cos(1), sin(2), cos(3)
+        dim_t = torch.arange(self.half_d_model, dtype=torch.float, device=self.device)
         inv_feq = 1.0 / (self.temperature ** (dim_t / self.half_d_model))
 
         pos_x = torch.einsum("b h w, d -> b h w d", x_embed, inv_feq)
         pos_y = torch.einsum("b h w, d -> b h w d", y_embed, inv_feq)
 
-        pos_x = torch.stack((pos_x.sin(), pos_x.cos()), dim=4).flatten(3)
-        pos_y = torch.stack((pos_y.sin(), pos_y.cos()), dim=4).flatten(3)
+        pos_x = torch.stack(
+            (pos_x[:, :, :, 0::2].sin(), pos_x[:, :, :, 1::2].cos()), dim=4
+        ).flatten(3)
+        pos_y = torch.stack(
+            (pos_y[:, :, :, 0::2].sin(), pos_y[:, :, :, 1::2].cos()), dim=4
+        ).flatten(3)
         pos = torch.cat((pos_x, pos_y), dim=3)
 
         x = x + pos
@@ -115,9 +127,11 @@ class WordRotaryEmbed(pl.LightningModule):
     lucidrains implementation: https://github.com/lucidrains/perceiver-pytorch/blob/main/perceiver_pytorch/rotary.py
     """
 
-    def __init__(self, d_model: int = 512) -> None:
+    def __init__(self, d_model: int = 512, temperature: float = 10000.0) -> None:
         super().__init__()
-        inv_freq = 1.0 / (10000 ** (torch.arange(0, d_model, 2).float() / d_model))
+        inv_freq = 1.0 / (
+            temperature ** (torch.arange(0, d_model, 2).float() / d_model)
+        )
         self.register_buffer("inv_freq", inv_freq)
 
     def forward(self, x: torch.FloatTensor):
@@ -149,7 +163,13 @@ class ImageRotaryEmbed(pl.LightningModule):
     2-D Generalized version of WordRotaryEmbedding
     """
 
-    def __init__(self, d_model=512, temperature=10000, normalize=False, scale=None):
+    def __init__(
+        self,
+        d_model: int = 512,
+        temperature: float = 10000,
+        normalize: bool = False,
+        scale: Optional[float] = None,
+    ):
         super().__init__()
         assert d_model % 2 == 0
         self.half_d_model = d_model // 2
@@ -200,7 +220,8 @@ class ImageRotaryEmbed(pl.LightningModule):
         )
 
         # [b, h, w, d_model]
-        sin, cos = map(lambda t: torch.cat(t, dim=-1), (sin_x, sin_y), (cos_x, cos_y))
+        sin = torch.cat((sin_x, sin_y), dim=-1)
+        cos = torch.cat((cos_x, cos_y), dim=-1)
 
         x = (x * cos) + (rotate_every_two(x) * sin)
         return x
