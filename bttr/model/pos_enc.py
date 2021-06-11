@@ -89,7 +89,7 @@ class ImgPosEnc(pl.LightningModule):
             y_embed = y_embed / (y_embed[:, -1:, :] + eps) * self.scale
             x_embed = x_embed / (x_embed[:, :, -1:] + eps) * self.scale
 
-        # not exactly the same as conccat two WordPosEnc
+        # not exactly the same as concat two WordPosEnc
         # WordPosEnc: sin(0), cos(0), sin(2), cos(2)
         # ImagePosEnc: sin(0), cos(1), sin(2), cos(3)
         dim_t = torch.arange(self.half_d_model, dtype=torch.float, device=self.device)
