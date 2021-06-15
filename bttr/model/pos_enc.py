@@ -8,7 +8,7 @@ from einops import rearrange, repeat
 
 class WordPosEnc(pl.LightningModule):
     def __init__(
-        self, d_model: int = 512, max_len: int = 5000, temperature: float = 10000.0
+        self, d_model: int = 512, max_len: int = 500, temperature: float = 10000.0
     ) -> None:
         super().__init__()
         pe = torch.zeros(max_len, d_model)
