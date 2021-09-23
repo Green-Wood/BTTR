@@ -4,7 +4,7 @@
 
 [![arXiv](https://img.shields.io/badge/arXiv-2105.02412-b31b1b.svg)](https://arxiv.org/abs/2105.02412)
 
-[Springer](https://link.springer.com/chapter/10.1007%2F978-3-030-86331-9_37)
+[![Springer](https://badgen.net/badge/Springer/BTTR-paper/purple)](https://link.springer.com/chapter/10.1007%2F978-3-030-86331-9_37)
  
 </div>
  
