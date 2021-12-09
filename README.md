@@ -80,23 +80,10 @@ For more accurate metrics:
 }
 ```
 ```
-@InProceedings{10.1007/978-3-030-86331-9_37,
-author="Zhao, Wenqi
-and Gao, Liangcai
-and Yan, Zuoyu
-and Peng, Shuai
-and Du, Lin
-and Zhang, Ziyin",
-editor="Llad{\'o}s, Josep
-and Lopresti, Daniel
-and Uchida, Seiichi",
-title="Handwritten Mathematical Expression Recognition with Bidirectionally Trained Transformer",
-booktitle="Document Analysis and Recognition -- ICDAR 2021",
-year="2021",
-publisher="Springer International Publishing",
-address="Cham",
-pages="570--584",
-abstract="Encoder-decoder models have made great progress on handwritten mathematical expression recognition recently. However, it is still a challenge for existing methods to assign attention to image features accurately. Moreover, those encoder-decoder models usually adopt RNN-based models in their decoder part, which makes them inefficient in processing long sequences. In this paper, a transformer-based decoder is employed to replace RNN-based ones, which makes the whole model architecture very concise. Furthermore, a novel training strategy is introduced to fully exploit the potential of the transformer in bidirectional language modeling. Compared to several methods that do not use data augmentation, experiments demonstrate that our model improves the ExpRate of current state-of-the-art methods on CROHME 2014 by 2.23{\%}. Similarly, on CROHME 2016 and CROHME 2019, we improve the ExpRate by 1.92{\%} and 2.28{\%} respectively.",
-isbn="978-3-030-86331-9"
+@inproceedings{Zhao2021HandwrittenME,
+  title={Handwritten Mathematical Expression Recognition with Bidirectionally Trained Transformer},
+  author={Wenqi Zhao and Liangcai Gao and Zuoyu Yan and Shuai Peng and Lin Du and Ziyin Zhang},
+  booktitle={ICDAR},
+  year={2021}
 }
 ```   
