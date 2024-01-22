@@ -24,7 +24,7 @@ conda activate bttr
 conda install --yes -c pytorch pytorch=1.7.0 torchvision cudatoolkit=<your-cuda-version>
 pip install -e .   
  ```   
- Next, navigate to any file and run it. It may take **6~7** hours to coverage on **4** gpus using ddp.
+ Next, navigate to any file and run it. It may take **6~7** hours to converge on **4** gpus using ddp.
  ```bash
 # module folder
 cd BTTR
